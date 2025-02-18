@@ -141,23 +141,32 @@ if st.button("Predict"):
     st.write(advice)
     # 添加SHAP解释可视化
     
-   
+    # 初始化解释器（需在第一次运行时计算）
+    explainer = shap.TreeExplainer(model) 
 
-    # SHAP可视化部分
-    st.subheader("SHAP解释")
+    # 标准化连续变量（与训练时一致）
+    scaled_features = feature_values.copy()
+    scaled_features[6] = (feature_values[6] - scaler.mean_[0]) / scaler.scale_[0]  # P_F标准化
+    scaled_features[7] = (feature_values[7] - scaler.mean_[1]) / scaler.scale_[1]  # LAC标准化
+
+    # 生成 SHAP 值（注意分类模型的结构）
+    sample_df = pd.DataFrame([scaled_features], columns=feature_names)
+    shap_values = explainer.shap_values(sample_df)
+
+    # 二分类模型需指定目标类别（通常展示类别1的SHAP值）
+    class_idx = 1  # 假设关注阳性类别（高风险）
+    expected_value = explainer.expected_value[class_idx]
     
-    explainer = shap.TreeExplainer(model)
-    shap_values = explainer(features)  # 使用新式API获取SHAP值
-    
-    # 确保使用正确的类别索引（这里以二分类为例）
-    class_index = 1  # 假设我们要解释类别1（高风险）
-    
-    plt.figure(figsize=(10, 6))
-    shap.plots.waterfall(
-        shap_values[0, :, class_index],  # 第一个样本，目标类别
-        max_display=8,
+    # 生成并保存力图（使用原始特征值显示）
+    plt.figure()
+    shap.force_plot(
+        expected_value,
+        shap_values[class_idx][0],  # 取第一个样本的SHAP值
+        features=sample_df.iloc[0].values,  # 用标准化后的值计算，但显示原始名称
         feature_names=feature_names,
-        show=False
+        matplotlib=True,
+        show=False  # 避免自动弹出窗口
     )
-    st.pyplot(plt.gcf())
-    plt.clf()
+    plt.tight_layout()
+    plt.savefig("shap_plot.png", bbox_inches='tight', dpi=300)
+    st.image("shap_plot.png")
