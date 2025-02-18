@@ -9,7 +9,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 #导入训练集数据
-train_data =pd.read_csv("D:\\numpy\\001科研\\训练集建模因素.csv",encoding='utf-8')
+train_data =pd.read_csv("训练集建模因素.csv",encoding='utf-8')
 print(train_data.shape) #获取目前的形状
 print(train_data.columns)
 trainy=train_data.OUTCOME
