@@ -139,34 +139,29 @@ if st.button("Predict"):
             )
           
     st.write(advice)
-    # 添加SHAP解释可视化
+     # 添加SHAP可视化
+    st.markdown("### SHAP解释")
     
-    # 初始化解释器（需在第一次运行时计算）
-    explainer = shap.TreeExplainer(model) 
-
-    # 标准化连续变量（与训练时一致）
-    scaled_features = feature_values.copy()
-    scaled_features[6] = (feature_values[6] - scaler.mean_[0]) / scaler.scale_[0]  # P_F标准化
-    scaled_features[7] = (feature_values[7] - scaler.mean_[1]) / scaler.scale_[1]  # LAC标准化
-
-    # 生成 SHAP 值（注意分类模型的结构）
-    sample_df = pd.DataFrame([scaled_features], columns=feature_names)
-    shap_values = explainer.shap_values(sample_df)
-
-    # 二分类模型需指定目标类别（通常展示类别1的SHAP值）
-    class_idx = 1  # 假设关注阳性类别（高风险）
-    expected_value = explainer.expected_value[class_idx]
+    # 创建解释器
+    explainer = shap.TreeExplainer(model)
     
-    # 生成并保存力图（使用原始特征值显示）
-    plt.figure()
-    shap.force_plot(
-        expected_value,
-        shap_values[class_idx][0],  # 取第一个样本的SHAP值
-        features=sample_df.iloc[0].values,  # 用标准化后的值计算，但显示原始名称
-        feature_names=feature_names,
-        matplotlib=True,
-        show=False  # 避免自动弹出窗口
-    )
-    plt.tight_layout()
-    plt.savefig("shap_plot.png", bbox_inches='tight', dpi=300)
-    st.image("shap_plot.png")
+    # 获取SHAP值
+    shap_values = explainer.shap_values(features)
+    
+    # 创建瀑布图
+    plt.figure(figsize=(10, 6))
+    shap.plots._waterfall.waterfall_legacy(explainer.expected_value[1], 
+                                         shap_values[1][0], 
+                                         feature_names=feature_names,
+                                         max_display=10)
+    st.pyplot(plt.gcf())
+    plt.clf()
+
+    # 添加特征重要性解释文本
+    st.write("""
+    **SHAP值解释：**
+    - 正值（红色）表示该特征增加了预测风险
+    - 负值（蓝色）表示该特征降低了预测风险
+    - 基值：{:.2f}（平均预测值）
+    - 最终预测值：{:.2f}
+    """.format(explainer.expected_value[1], explainer.expected_value[1] + shap_values[1][0].sum()))
