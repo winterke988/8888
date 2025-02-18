@@ -7,6 +7,7 @@ from sklearn.model_selection import GridSearchCV###网格搜索
 import joblib
 import streamlit as st
 import matplotlib.pyplot as plt
+import shap
 
 #导入训练集数据
 train_data =pd.read_csv("训练集建模因素.csv",encoding='utf-8')
