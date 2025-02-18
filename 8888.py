@@ -140,18 +140,24 @@ if st.button("Predict"):
           
     st.write(advice)
     # 添加SHAP解释可视化
+    
+   
+
+    # SHAP可视化部分
     st.subheader("SHAP解释")
     
-    # 创建解释器并计算SHAP值
     explainer = shap.TreeExplainer(model)
-    shap_values = explainer.shap_values(features)
+    shap_values = explainer(features)  # 使用新式API获取SHAP值
     
-    # 创建瀑布图
+    # 确保使用正确的类别索引（这里以二分类为例）
+    class_index = 1  # 假设我们要解释类别1（高风险）
+    
     plt.figure(figsize=(10, 6))
-    shap.plots.waterfall(shap.Explanation(values=shap_values[0][0], 
-                                        base_values=explainer.expected_value,
-                                        feature_names=feature_names,
-                                        data=features[0]), 
-                        max_display=8)
+    shap.plots.waterfall(
+        shap_values[0, :, class_index],  # 第一个样本，目标类别
+        max_display=8,
+        feature_names=feature_names,
+        show=False
+    )
     st.pyplot(plt.gcf())
     plt.clf()
