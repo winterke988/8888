@@ -105,7 +105,7 @@ P_F = st.number_input("P_F:", min_value=1, max_value=850, value=150)
 LAC= st.number_input("LAC:", min_value=1, max_value=35, value=1)
 # Process inputs and make predictions
 feature_values = [decision_time,Nutritional_Methods,blood_glucose_0,blood_glucose_1,blood_glucose_2,mechanical_ventilation,P_F,LAC ]
-features = np.array([feature_values])
+features = pd.DataFrame([feature_values], columns=feature_names)
 
 if st.button("Predict"):
     # Predict class and probabilities
@@ -149,6 +149,7 @@ if st.button("Predict"):
     plt.figure(figsize=(10, 5), dpi=1200)
     shap.plots.waterfall(shap_values[0][:, predicted_class], 
                         max_display=13,
+                        feature_names=feature_names
                         show=False)
     plt.tight_layout()
     
