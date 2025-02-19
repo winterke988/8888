@@ -104,7 +104,7 @@ mechanical_ventilation=st.selectbox("mechanical_ventilation(0=NO, 1=YES):", opti
 P_F = st.number_input("P_F:", min_value=1, max_value=850, value=150)
 LAC= st.number_input("LAC:", min_value=1, max_value=35, value=1)
 # Process inputs and make predictions
-feature_values = [,P_F,LAC,decision_time,Nutritional_Methods,blood_glucose_0,blood_glucose_1,blood_glucose_2,mechanical_ventilation]
+feature_values = [P_F,LAC,decision_time,Nutritional_Methods,blood_glucose_0,blood_glucose_1,blood_glucose_2,mechanical_ventilation]
 features = pd.DataFrame([feature_values], columns=feature_names)
 
 if st.button("Predict"):
