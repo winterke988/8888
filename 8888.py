@@ -141,27 +141,20 @@ if st.button("Predict"):
     st.write(advice)
      # 添加SHAP可视化
     st.markdown("### SHAP解释")
-    
-    # 创建解释器
+      # SHAP解释
     explainer = shap.TreeExplainer(model)
-    
-    # 获取SHAP值
-    shap_values = explainer.shap_values(features)
+    shap_values = explainer(features)
     
     # 创建瀑布图
-    plt.figure(figsize=(10, 6))
-    shap.plots._waterfall.waterfall_legacy(explainer.expected_value[1], 
-                                         shap_values[1][0], 
-                                         feature_names=feature_names,
-                                         max_display=10)
+    plt.figure(figsize=(10, 5), dpi=1200)
+    shap.plots.waterfall(shap_values[0][:, predicted_class], 
+                        max_display=13,
+                        show=False)
+    plt.tight_layout()
+    
+    # 在Streamlit中显示图表
     st.pyplot(plt.gcf())
-    plt.clf()
+    plt.clf() 
 
-    # 添加特征重要性解释文本
-    st.write("""
-    **SHAP值解释：**
-    - 正值（红色）表示该特征增加了预测风险
-    - 负值（蓝色）表示该特征降低了预测风险
-    - 基值：{:.2f}（平均预测值）
-    - 最终预测值：{:.2f}
-    """.format(explainer.expected_value[1], explainer.expected_value[1] + shap_values[1][0].sum()))
+
+    
