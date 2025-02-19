@@ -150,7 +150,7 @@ if st.button("Predict"):
     plt.figure(figsize=(10, 5), dpi=1200)
     shap.plots.waterfall(shap_values[0][:, predicted_class], 
                         max_display=13,
-                        feature_names=feature_names
+                        feature_names=feature_names,
                         show=False)
     plt.tight_layout()
     
