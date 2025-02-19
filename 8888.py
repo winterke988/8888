@@ -91,24 +91,23 @@ mechanical_ventilation_options = {
 }
 
 # Define feature names
-feature_names = ['decision_time', 'Nutritional_Methods', 'blood_glucose_0_7.8-10',
-       'blood_glucose_1_11.1', 'blood_glucose_2_2.8', 'mechanical_ventilation',
-       'P_F', 'LAC']
-
+feature_names = ['P_F', 'LAC','decision_time', 'Nutritional_Methods', 'blood_glucose_0_7.8-10',
+       'blood_glucose_1_11.1', 'blood_glucose_2_2.8', 'mechanical_ventilation'
+       ]
+P_F = st.number_input("P_F:", min_value=1, max_value=850, value=150)
+LAC= st.number_input("LAC:", min_value=1, max_value=35, value=1)
 decision_time= st.selectbox("decision_time (0=in 6 hour, 1=above 6 hour):", options=[0, 1], format_func=lambda x: 'in 6 hour (0)' if x == 0 else 'above 6 hour (1)')
 Nutritional_Methods= st.selectbox("Nutritional_Methods (0=EN, 1=PN):", options=[0, 1], format_func=lambda x: 'EN (0)' if x == 0 else 'PN (1)')
 blood_glucose_0= st.selectbox("blood_glucose_0_7.8-10 (0=NO, 1=YES):", options=[0, 1], format_func=lambda x: 'NO (0)' if x == 0 else 'YES (1)')
 blood_glucose_1= st.selectbox("blood_glucose_1_11.1 (0=NO, 1=YES):", options=[0, 1], format_func=lambda x: 'NO (0)' if x == 0 else 'YES (1)')
 blood_glucose_2= st.selectbox("blood_glucose_2_2.8(0=NO, 1=YES):", options=[0, 1], format_func=lambda x: 'NO (0)' if x == 0 else 'YES (1)')
 mechanical_ventilation=st.selectbox("mechanical_ventilation(0=NO, 1=YES):", options=[0, 1], format_func=lambda x: 'NO (0)' if x == 0 else 'YES (1)')
-P_F = st.number_input("P_F:", min_value=1, max_value=850, value=150)
-LAC= st.number_input("LAC:", min_value=1, max_value=35, value=1)
-# Process inputs and make predictions
-feature_values = [decision_time,Nutritional_Methods,blood_glucose_0,blood_glucose_1,blood_glucose_2,mechanical_ventilation,P_F,LAC ]
-features = np.array([feature_values])
 
+# Process inputs and make predictions
+feature_values = [P_F,LAC,decision_time,Nutritional_Methods,blood_glucose_0,blood_glucose_1,blood_glucose_2,mechanical_ventilation]
+features = pd.DataFrame([feature_values], columns=feature_names)
 if st.button("Predict"):
-    features = pd.DataFrame([feature_values], columns=feature_names)
+    
     # Predict class and probabilities
     predicted_class = model.predict(features)[0]
     predicted_proba = model.predict_proba(features)[0]
